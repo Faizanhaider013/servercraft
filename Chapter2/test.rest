@@ -1,0 +1,22 @@
+GET http://localhost:8383
+
+
+
+### Test GET / dashboard website
+
+GET http://localhost:8383/dashboard
+
+### Data Endpointdata
+GET http://localhost:8383/api/data
+
+### datapoint for adding the user
+POST http://localhost:8383/api/data
+Content-Type: application/json
+
+{
+    "name": "Faizan"
+}
+
+### datapoint for deleting the user
+
+DELETE http://localhost:8383/api/data
