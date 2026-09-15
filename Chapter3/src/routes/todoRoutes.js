@@ -37,9 +37,6 @@ router.post('/', (req, res) => {
     try {
         const { task } = req.body
 
-        console.log('TASK:', task)
-        console.log('USER ID:', req.userId)
-
         if (!task || task.trim() === '') {
             return res.status(400).json({
                 message: 'Task is required'

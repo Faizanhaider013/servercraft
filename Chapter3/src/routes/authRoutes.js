@@ -9,6 +9,13 @@ const router = express.Router()
 router.post('/register', (req, res) => {
     const { username, password } = req.body
 
+    // Validate input
+    if (!username || !password) {
+        return res.status(400).json({
+            message: 'Username and password are required'
+        })
+    }
+
     try {
         // Hash the password
         const hashedPassword = bcrypt.hashSync(password, 8)
@@ -47,8 +54,15 @@ router.post('/register', (req, res) => {
     }  catch (err) {
     console.error('REGISTER ERROR:', err)
 
+    // Username already taken (UNIQUE constraint)
+    if (err.code === 'ERR_SQLITE_ERROR' && /UNIQUE/i.test(err.message)) {
+        return res.status(409).json({
+            error: 'Username already taken'
+        })
+    }
+
     return res.status(500).json({
-        error: err.message
+        error: 'Registration failed'
     })
 }
 })
@@ -59,14 +73,18 @@ router.post('/login', (req, res) => {
 
     const { username, password } = req.body
 
+    // Validate input
+    if (!username || !password) {
+        return res.status(400).json({
+            error: 'Username and password are required'
+        })
+    }
+
     try {
         const user = db.prepare(`
             SELECT * FROM user
             WHERE username = ?
         `).get(username)
-
-        console.log('USERNAME:', username)
-        console.log('USER FROM DB:', user)
 
         if (!user) {
             return res.status(401).json({
@@ -78,8 +96,6 @@ router.post('/login', (req, res) => {
             password,
             user.password
         )
-
-        console.log('PASSWORD MATCH:', passwordMatch)
 
         if (!passwordMatch) {
             return res.status(401).json({
